@@ -1,0 +1,64 @@
+canonical_skill,aliases,category
+Hadoop,hadoop,hdp,apache hadoop,Big Data
+Spark,apache spark,pyspark,spark streaming,Big Data
+Hive,apache hive,hiveql,Big Data
+Pig,apache pig,pig latin,Big Data
+HDFS,hadoop distributed file system,hadoop fs,Big Data
+MapReduce,map reduce,mapreduce job,Big Data
+YARN,hadoop yarn,resource manager,Big Data
+HBase,apache hbase,hbase nosql,Big Data
+Kafka,apache kafka,kafka streams,Big Data
+Flink,apache flink,flink streaming,Big Data
+Storm,apache storm,storm topology,Big Data
+Zookeeper,apache zookeeper,zk,Big Data
+Sqoop,apache sqoop,Big Data
+Flume,apache flume,Big Data
+Python,python3,python 3,python scripting,Programming
+Java,java 8,java 11,core java,Programming
+Scala,scala lang,Programming
+R,r programming,r language,r stats,Programming
+SQL,structured query language,sql query,Programming
+Bash,shell scripting,bash scripting,shell script,Programming
+C++,cplusplus,c plus plus,Programming
+Go,golang,go lang,Programming
+Julia,julia lang,Programming
+TensorFlow,tensorflow 2,tf,tf2,ML/AI
+PyTorch,pytorch,torch,ML/AI
+scikit-learn,sklearn,scikit learn,sci-kit learn,ML/AI
+Keras,keras api,ML/AI
+XGBoost,xgb,extreme gradient boosting,ML/AI
+LightGBM,lgbm,light gbm,ML/AI
+NLTK,natural language toolkit,ML/AI
+spaCy,spacy nlp,ML/AI
+AWS,amazon web services,amazon aws,Cloud
+Azure,microsoft azure,azure cloud,Cloud
+GCP,google cloud,google cloud platform,Cloud
+Docker,docker container,containerization,Cloud
+Kubernetes,k8s,kube,Cloud
+Terraform,infrastructure as code,tf iac,Cloud
+Ansible,ansible automation,Cloud
+MySQL,mysql database,my sql,Databases
+PostgreSQL,postgres,postgresql db,Databases
+MongoDB,mongo,mongodb nosql,Databases
+Cassandra,apache cassandra,Databases
+Redis,redis cache,redis db,Databases
+Elasticsearch,elastic search,elastic,Databases
+Oracle,oracle db,oracle database,Databases
+SQL Server,mssql,microsoft sql server,Databases
+DynamoDB,dynamo db,amazon dynamodb,Databases
+Tableau,tableau desktop,tableau server,Visualization
+Power BI,powerbi,power bi desktop,Visualization
+matplotlib,matplotlib python,plt,Visualization
+Seaborn,seaborn python,sns,Visualization
+Excel,microsoft excel,ms excel,Visualization
+Plotly,plotly python,plotly dash,Visualization
+Grafana,grafana dashboard,Visualization
+Git,git version control,github,gitlab,DevOps
+Jenkins,jenkins ci,jenkins pipeline,DevOps
+Airflow,apache airflow,airflow dag,DevOps
+Luigi,luigi workflow,DevOps
+Oozie,apache oozie,DevOps
+MLflow,ml flow,mlflow tracking,DevOps
+Pandas,pandas python,pd,Python Libraries
+NumPy,numpy python,np,Python Libraries
+SciPy,scipy python,Python Libraries

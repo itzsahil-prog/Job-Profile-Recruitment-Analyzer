@@ -1,0 +1,13 @@
+﻿version: '3.8'
+
+services:
+  bigdata-analyzer:
+    build: .
+    container_name: job-analyzer
+    volumes:
+      - ./data:/app/data
+      - ./outputs:/app/outputs
+      - ./visualizations:/app/visualizations
+    environment:
+      - PYTHONUNBUFFERED=1
+    command: python local_sim/run_mapreduce.py

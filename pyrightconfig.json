@@ -1,0 +1,15 @@
+{
+  "include": [
+    "analytics",
+    "local_sim",
+    "mapreduce",
+    "tests"
+  ],
+  "extraPaths": [
+    "mapreduce",
+    "analytics",
+    "local_sim"
+  ],
+  "venvPath": ".",
+  "venv": ".venv"
+}

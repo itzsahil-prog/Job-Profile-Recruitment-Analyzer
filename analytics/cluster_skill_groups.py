@@ -2,135 +2,154 @@
 """
 cluster_skill_groups.py — K-means clustering of skills into k=9 groups.
 
-Reads the binary job-by-skill matrix produced by build_vectors.py, transposes it
-to obtain a skill-by-job co-occurrence matrix, and clusters skills into k=9 groups
-using scikit-learn KMeans.
-
-Parameters:
-    k = 9 (configurable via --k)
-    random_state = 42 (fixed for reproducibility)
-    n_init = 10
+Reads outputs/job_skill_matrix.csv, transposes to skill-by-job vectors,
+clusters skills into k=9 groups.
 
 Outputs:
-    outputs/skill_group_assignments.csv — columns: canonical_skill, group_id
-    outputs/skill_group_summary.csv     — columns: group_id, size, top_skills
-
-Usage:
-    python analytics/cluster_skill_groups.py --matrix outputs/job_skill_matrix.csv
-    python analytics/cluster_skill_groups.py --matrix outputs/job_skill_matrix.csv \\
-        --k 9 --output-dir outputs/
+    outputs/skill_group_assignments.csv — columns: skill_name, group_id, group_label
+    outputs/skill_group_summary.csv     — columns: group_id, group_label, member_skills
+    outputs/skill_group_elbow.json      — elbow data (k=2..12) and silhouette score
 """
-
-import argparse
+import json
 import os
 import sys
+import time
 
 import numpy as np
 import pandas as pd
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
 
+WORKDIR       = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+MATRIX_CSV    = os.path.join(WORKDIR, 'outputs', 'job_skill_matrix.csv')
+ASSIGN_OUT    = os.path.join(WORKDIR, 'outputs', 'skill_group_assignments.csv')
+SUMMARY_OUT   = os.path.join(WORKDIR, 'outputs', 'skill_group_summary.csv')
+ELBOW_OUT     = os.path.join(WORKDIR, 'outputs', 'skill_group_elbow.json')
+RANDOM_STATE  = 42
+N_CLUSTERS    = 9
+N_INIT        = 10
 
-RANDOM_STATE = 42
-DEFAULT_K = 9
-DEFAULT_N_INIT = 10
+GROUP_LABEL_HINTS = [
+    (['python', 'r ', 'julia', 'scala', 'perl'], 'Scripting Languages'),
+    (['java', 'c++', 'c#', '.net', 'go ', 'rust', 'swift', 'kotlin'], 'Compiled & OOP Languages'),
+    (['sql', 'mysql', 'postgresql', 'oracle', 'nosql', 'mongodb', 'redis', 'cassandra', 'database'], 'Databases & Storage'),
+    (['hadoop', 'spark', 'hive', 'pig', 'kafka', 'hdfs', 'flink', 'storm', 'big data', 'mapreduce'], 'Big Data Platforms'),
+    (['tensorflow', 'pytorch', 'keras', 'scikit', 'machine learning', 'deep learning', 'nlp', 'ai ', 'neural', 'xgboost', 'regression'], 'ML & AI'),
+    (['aws', 'azure', 'gcp', 'cloud', 'docker', 'kubernetes', 'terraform', 'devops', 'ci/cd', 'jenkins', 'ansible'], 'Cloud & DevOps'),
+    (['tableau', 'power bi', 'qlik', 'looker', 'excel', 'reporting', 'dashboard', 'bi ', 'analytics', 'visualization'], 'BI & Visualization'),
+    (['javascript', 'typescript', 'react', 'angular', 'vue', 'node', 'html', 'css', 'frontend', 'backend', 'rest', 'api', 'web'], 'Web & App Development'),
+    (['agile', 'scrum', 'jira', 'project management', 'communication', 'leadership', 'stakeholder', 'excel', 'powerpoint'], 'Soft Skills & Management'),
+]
 
-
-def load_matrix(path):
-    """
-    Load the job-by-skill binary matrix from CSV.
-
-    Parameters
-    ----------
-    path : str
-
-    Returns
-    -------
-    pd.DataFrame
-        Index = job_id, columns = skill names.
-    """
-    if not os.path.isfile(path):
-        print(f"ERROR: Matrix file not found: {path}", file=sys.stderr)
-        sys.exit(1)
-    df = pd.read_csv(path, index_col=0)
-    df.index = df.index.astype(str)
-    return df
-
+def assign_group_label(skills_list):
+    """Assign label by majority vote among top skills."""
+    text = ' '.join(skills_list).lower()
+    scores = {}
+    for hints, label in GROUP_LABEL_HINTS:
+        score = sum(1 for h in hints if h in text)
+        if score > 0:
+            scores[label] = score
+    if scores:
+        return max(scores, key=scores.get)
+    return 'General Technology'
 
 def main():
-    """Parse arguments, run k-means on skills, and save results."""
-    parser = argparse.ArgumentParser(
-        description='Cluster skills into k groups based on job co-occurrence using K-means.'
-    )
-    parser.add_argument(
-        '--matrix', required=True,
-        help='Path to job-by-skill binary matrix CSV (from build_vectors.py)'
-    )
-    parser.add_argument(
-        '--output-dir', default='outputs',
-        help='Directory to save output files (default: outputs/)'
-    )
-    parser.add_argument(
-        '--k', type=int, default=DEFAULT_K,
-        help=f'Number of skill groups (default: {DEFAULT_K})'
-    )
-    args = parser.parse_args()
+    start = time.time()
+    print(f"[cluster_skill_groups] Reading {MATRIX_CSV}")
 
-    os.makedirs(args.output_dir, exist_ok=True)
+    if not os.path.isfile(MATRIX_CSV):
+        print(f"ERROR: {MATRIX_CSV} not found.", file=sys.stderr)
+        sys.exit(1)
 
-    # Load matrix
-    df = load_matrix(args.matrix)
-    print(f"Matrix loaded: {df.shape} ({df.shape[0]} jobs, {df.shape[1]} skills)")
+    df = pd.read_csv(MATRIX_CSV, index_col=0)
+    df.index = df.index.astype(str)
+    print(f"Matrix loaded: {df.shape} ({df.shape[0]} jobs x {df.shape[1]} skills)")
 
-    # Transpose to skill-by-job matrix
-    skill_df = df.T  # rows = skills, cols = jobs
+    # Transpose: rows=skills, cols=jobs
+    skill_df = df.T
     skill_names = skill_df.index.tolist()
+    print(f"Transposed: {skill_df.shape} ({len(skill_names)} skills x {skill_df.shape[1]} jobs)")
 
-    if len(skill_names) < args.k:
-        print(
-            f"ERROR: Not enough distinct skills ({len(skill_names)}) to form "
-            f"{args.k} groups.",
-            file=sys.stderr,
-        )
+    if len(skill_names) < N_CLUSTERS:
+        print(f"ERROR: Only {len(skill_names)} skills, need at least {N_CLUSTERS}", file=sys.stderr)
         sys.exit(1)
 
     X = skill_df.values.astype(float)
 
-    # Run KMeans
-    km = KMeans(n_clusters=args.k, random_state=RANDOM_STATE, n_init=DEFAULT_N_INIT)
+    # Run KMeans k=9
+    print(f"Running KMeans(k={N_CLUSTERS}, random_state={RANDOM_STATE}, n_init={N_INIT})...")
+    km = KMeans(n_clusters=N_CLUSTERS, random_state=RANDOM_STATE, n_init=N_INIT)
     labels = km.fit_predict(X)
-
     print(f"Inertia: {km.inertia_:.2f}")
 
+    # Silhouette
     if len(set(labels)) > 1:
         sil = silhouette_score(X, labels)
         print(f"Silhouette score: {sil:.4f}")
     else:
-        print("Silhouette score: N/A (only one cluster found)")
+        sil = None
 
-    # Build assignments
-    assignments_df = pd.DataFrame({
-        'canonical_skill': skill_names,
+    # Build assignments with group_label
+    group_labels = []
+    for i, skill in enumerate(skill_names):
+        group_labels.append(None)  # fill below
+
+    # First get member skills per group for labeling
+    group_members = {}
+    for gid in range(N_CLUSTERS):
+        members = [skill_names[i] for i, l in enumerate(labels) if l == gid]
+        group_members[gid] = members
+
+    # Assign labels
+    gid_to_label = {}
+    for gid, members in group_members.items():
+        lbl = assign_group_label(members[:20])
+        gid_to_label[gid] = lbl
+
+    # Build assignments df
+    assign_df = pd.DataFrame({
+        'skill_name': skill_names,
         'group_id': labels,
+        'group_label': [gid_to_label[l] for l in labels],
     })
-    assignments_out = os.path.join(args.output_dir, 'skill_group_assignments.csv')
-    assignments_df.to_csv(assignments_out, index=False)
-    print(f"Assignments saved to: {assignments_out}")
+    assign_df.to_csv(ASSIGN_OUT, index=False)
+    print(f"Assignments saved: {ASSIGN_OUT}")
 
-    # Build summary: for each group, list its skills
+    # Build summary
     summary_rows = []
-    for gid in range(args.k):
-        group_skills = assignments_df.loc[assignments_df['group_id'] == gid, 'canonical_skill'].tolist()
+    print("\nGroup summary:")
+    for gid in range(N_CLUSTERS):
+        members = group_members[gid]
+        lbl = gid_to_label[gid]
         summary_rows.append({
             'group_id': gid,
-            'size': len(group_skills),
-            'top_skills': '|'.join(group_skills[:10]),  # first 10 as representative
+            'group_label': lbl,
+            'member_skills': '|'.join(members),
         })
-    summary_df = pd.DataFrame(summary_rows)
-    summary_out = os.path.join(args.output_dir, 'skill_group_summary.csv')
-    summary_df.to_csv(summary_out, index=False)
-    print(f"Summary saved to: {summary_out}")
+        print(f"  Group {gid}: label={lbl}, size={len(members)}, sample={members[:5]}")
+    pd.DataFrame(summary_rows).to_csv(SUMMARY_OUT, index=False)
+    print(f"Summary saved: {SUMMARY_OUT}")
 
+    # Elbow data k=2..12
+    print("Computing elbow data (k=2..12)...")
+    elbow = []
+    for k in range(2, 13):
+        km_k = KMeans(n_clusters=k, random_state=RANDOM_STATE, n_init=N_INIT)
+        km_k.fit(X)
+        elbow.append({'k': k, 'inertia': float(km_k.inertia_)})
+        print(f"  k={k}: inertia={km_k.inertia_:.2f}")
+
+    elbow_data = {
+        'elbow': elbow,
+        'silhouette': float(sil) if sil is not None else None,
+        'chosen_k': N_CLUSTERS,
+    }
+    with open(ELBOW_OUT, 'w', encoding='utf-8') as f:
+        json.dump(elbow_data, f, indent=2)
+    print(f"Elbow data saved: {ELBOW_OUT}")
+
+    elapsed = time.time() - start
+    print(f"\ncluster_skill_groups complete in {elapsed:.1f}s")
 
 if __name__ == '__main__':
     main()

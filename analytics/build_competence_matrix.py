@@ -103,7 +103,7 @@ def main():
         help='Path to skill group assignments CSV (columns: canonical_skill, group_id)'
     )
     parser.add_argument(
-        '--job-skills', required=True,
+        '--job-skills', default='outputs/job_skills.csv',
         help='Path to job-skill pairs CSV (columns: job_id, skill_name)'
     )
     parser.add_argument(

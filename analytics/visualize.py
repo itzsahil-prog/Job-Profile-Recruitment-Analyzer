@@ -163,17 +163,31 @@ def plot_skill_group_sizes(outputs_dir, vis_dir):
     df.columns = df.columns.str.strip()
 
     group_col = next((c for c in df.columns if 'group' in c.lower()), None)
+    # size may be stored as count of member_skills pipe-separated, or explicit 'size' col
     size_col = next((c for c in df.columns if 'size' in c.lower()), None)
-    if not group_col or not size_col:
-        print(f"ERROR: Cannot find group/size columns in {path}. Columns: {list(df.columns)}", file=sys.stderr)
+    member_col = next((c for c in df.columns if 'member' in c.lower()), None)
+
+    if not group_col:
+        print(f"ERROR: Cannot find group column in {path}. Columns: {list(df.columns)}", file=sys.stderr)
         sys.exit(1)
 
-    df[size_col] = pd.to_numeric(df[size_col], errors='coerce')
-    df = df.dropna(subset=[size_col])
+    if size_col:
+        df[size_col] = pd.to_numeric(df[size_col], errors='coerce')
+        df = df.dropna(subset=[size_col])
+        sizes = df[size_col]
+    elif member_col:
+        # Derive size from pipe-separated member_skills
+        df['_size'] = df[member_col].fillna('').apply(lambda x: len([s for s in x.split('|') if s.strip()]))
+        sizes = df['_size']
+        size_col = '_size'
+    else:
+        print(f"ERROR: Cannot find size/member columns in {path}. Columns: {list(df.columns)}", file=sys.stderr)
+        sys.exit(1)
+
     labels = [f"Group {v}" for v in df[group_col]]
 
     fig, ax = plt.subplots(figsize=(10, 5))
-    bars = ax.bar(labels, df[size_col], color='darkorange')
+    bars = ax.bar(labels, sizes, color='darkorange')
     ax.bar_label(bars, fmt='%d', padding=3)
     ax.set_xlabel('Skill Group', fontsize=11)
     ax.set_ylabel('Number of Skills', fontsize=11)
@@ -232,30 +246,37 @@ def plot_elbow(outputs_dir, vis_dir):
     outputs_dir : str
     vis_dir : str
     """
-    path = os.path.join(outputs_dir, 'cluster_evaluation.json')
-    require_file(path)
+    jf_path = os.path.join(outputs_dir, 'job_family_elbow.json')
+    sg_path = os.path.join(outputs_dir, 'skill_group_elbow.json')
+    require_file(jf_path)
+    require_file(sg_path)
 
-    with open(path, encoding='utf-8') as f:
-        data = json.load(f)
+    with open(jf_path, encoding='utf-8') as f:
+        jf_data = json.load(f)
+    with open(sg_path, encoding='utf-8') as f:
+        sg_data = json.load(f)
 
     fig, ax = plt.subplots(figsize=(8, 5))
 
-    for key, label, color, marker in [
-        ('job_families', 'Job Families (jobs)', 'steelblue', 'o'),
-        ('skill_groups', 'Skill Groups (skills)', 'darkorange', 's'),
-    ]:
-        elbow = data.get(key, {}).get('elbow', [])
-        if elbow:
-            ks = [e['k'] for e in elbow]
-            inertias = [e['inertia'] for e in elbow]
-            ax.plot(ks, inertias, marker=marker, color=color, label=label)
+    jf_elbow = jf_data.get('elbow', [])
+    if jf_elbow:
+        ks = [e['k'] for e in jf_elbow]
+        inertias = [e['inertia'] for e in jf_elbow]
+        ax.plot(ks, inertias, marker='o', color='steelblue', label='Job Families (jobs)')
+
+    sg_elbow = sg_data.get('elbow', [])
+    if sg_elbow:
+        ks = [e['k'] for e in sg_elbow]
+        inertias = [e['inertia'] for e in sg_elbow]
+        ax.plot(ks, inertias, marker='s', color='darkorange', label='Skill Groups (skills)')
 
     ax.set_xlabel('Number of Clusters (k)', fontsize=11)
     ax.set_ylabel('Inertia (within-cluster sum of squares)', fontsize=11)
     ax.set_title('Elbow Method — Optimal k Selection', fontsize=13, fontweight='bold')
     ax.legend(fontsize=10)
     ax.xaxis.set_major_locator(mticker.MaxNLocator(integer=True))
-    fig.text(0.99, 0.01, f'Source: {path}', ha='right', fontsize=7, color='gray')
+    fig.text(0.99, 0.01, f'Source: job_family_elbow.json + skill_group_elbow.json', ha='right', fontsize=7, color='gray')
+    fig.tight_layout()
 
     save_and_close(fig, os.path.join(vis_dir, 'elbow_plot.png'))
 

@@ -1,7 +1,8 @@
-__pycache__/
+﻿__pycache__/
 *.pyc
 .env
 venv/
+.venv/
 env/
 *.egg-info/
 data/*.csv
@@ -13,3 +14,6 @@ visualizations/*.png
 node_modules/
 .DS_Store
 Thumbs.db
+.pytest_cache/
+*.pyc
+.meta.json

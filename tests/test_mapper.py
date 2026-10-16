@@ -1,11 +1,3 @@
-"""
-test_mapper.py — Unit tests for mapreduce/mapper.py
-
-Tests use a synthetic skills dictionary fixture, not the real config file.
-All test data is SYNTHETIC and created solely for testing purposes.
-It does NOT represent real job postings or real persons.
-"""
-
 import csv
 import io
 import os

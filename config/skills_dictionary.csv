@@ -62,3 +62,19 @@ MLflow,ml flow,mlflow tracking,DevOps
 Pandas,pandas python,pd,Python Libraries
 NumPy,numpy python,np,Python Libraries
 SciPy,scipy python,Python Libraries
+NLP,natural language processing,text mining,text analytics,ML/AI
+deep learning,deep neural networks,dnn,ML/AI
+machine learning,ml algorithms,ml models,ml pipeline,ML/AI
+statistics,statistical analysis,statistical modeling,Analytics
+data visualization,data viz,visualization tools,Analytics
+ETL,etl pipeline,extract transform load,Data Engineering
+data warehousing,data warehouse,dwh,Data Engineering
+data modeling,data models,dimensional modeling,Data Engineering
+data pipeline,data pipelines,batch pipeline,Data Engineering
+data governance,data quality,data management,Data Engineering
+Agile,agile methodology,scrum,kanban,Project Management
+JavaScript,js,nodejs,node.js,typescript,Programming
+CI/CD,continuous integration,continuous deployment,cicd pipeline,DevOps
+NoSQL,nosql database,Database
+ZooKeeper,apache zookeeper,Big Data
+NiFi,apache nifi,Big Data

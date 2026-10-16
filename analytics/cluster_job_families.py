@@ -2,184 +2,135 @@
 """
 cluster_job_families.py — K-means clustering of job postings into k=4 job families.
 
-Reads the binary job-by-skill matrix produced by build_vectors.py and assigns
-each job posting to one of k=4 clusters (job families) using scikit-learn KMeans.
-
-Parameters:
-    k = 4 (configurable via --k)
-    random_state = 42 (fixed for reproducibility)
-    n_init = 10
+Reads outputs/job_skill_matrix.csv, clusters into k=4 families, assigns labels
+based on actual dominant skills.
 
 Outputs:
-    outputs/job_family_assignments.csv  — columns: job_id, cluster_id
-    outputs/job_family_summary.csv      — columns: cluster_id, size, top_skills
-
-Usage:
-    python analytics/cluster_job_families.py --matrix outputs/job_skill_matrix.csv
-    python analytics/cluster_job_families.py --matrix outputs/job_skill_matrix.csv \\
-        --k 4 --output-dir outputs/
+    outputs/job_family_assignments.csv — columns: job_id, cluster_id
+    outputs/job_family_summary.csv     — columns: cluster_id, family_label, size, top_skills
+    outputs/job_family_elbow.json      — elbow data (k=2..8) and silhouette score
 """
-
-import argparse
+import json
 import os
 import sys
+import time
 
 import numpy as np
 import pandas as pd
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
 
+WORKDIR       = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+MATRIX_CSV    = os.path.join(WORKDIR, 'outputs', 'job_skill_matrix.csv')
+ASSIGN_OUT    = os.path.join(WORKDIR, 'outputs', 'job_family_assignments.csv')
+SUMMARY_OUT   = os.path.join(WORKDIR, 'outputs', 'job_family_summary.csv')
+ELBOW_OUT     = os.path.join(WORKDIR, 'outputs', 'job_family_elbow.json')
+RANDOM_STATE  = 42
+N_CLUSTERS    = 4
+N_INIT        = 10
+SAMPLE_N      = 200_000  # max rows; already sampled by build_vectors
 
-RANDOM_STATE = 42
-DEFAULT_K = 4
-DEFAULT_N_INIT = 10
-
-
-def load_matrix(path):
-    """
-    Load the job-by-skill binary matrix from CSV.
-
-    Parameters
-    ----------
-    path : str
-
-    Returns
-    -------
-    pd.DataFrame
-        Index = job_id, columns = skill names.
-    """
-    if not os.path.isfile(path):
-        print(f"ERROR: Matrix file not found: {path}", file=sys.stderr)
-        sys.exit(1)
-    df = pd.read_csv(path, index_col=0)
-    df.index = df.index.astype(str)
-    return df
-
-
-def validate_matrix(df, k):
-    """
-    Validate that the matrix is large enough and non-degenerate.
-
-    Removes zero-variance columns (skills that are always 0 or always 1),
-    then checks that at least k*2 rows remain.
-
-    Parameters
-    ----------
-    df : pd.DataFrame
-    k : int
-
-    Returns
-    -------
-    pd.DataFrame
-        Cleaned matrix with non-degenerate columns only.
-    """
-    # Drop zero-variance columns
-    variance = df.var(axis=0)
-    nonzero_var_cols = variance[variance > 0].index.tolist()
-    if len(nonzero_var_cols) == 0:
-        print("ERROR: All feature columns have zero variance. Cannot cluster.", file=sys.stderr)
-        sys.exit(1)
-    df_clean = df[nonzero_var_cols]
-
-    if len(df_clean) < k * 2:
-        print(
-            f"ERROR: Not enough records ({len(df_clean)}) to form {k} clusters. "
-            f"Need at least {k * 2} rows.",
-            file=sys.stderr,
-        )
-        sys.exit(1)
-
-    return df_clean
-
-
-def get_top_skills(cluster_centers, feature_names, top_n=5):
-    """
-    Return the top-n skill names for each cluster center.
-
-    Parameters
-    ----------
-    cluster_centers : np.ndarray  shape (k, n_features)
-    feature_names : list of str
-    top_n : int
-
-    Returns
-    -------
-    list of str
-        One string per cluster with top skill names joined by '|'.
-    """
-    result = []
-    for center in cluster_centers:
-        indices = np.argsort(center)[::-1][:top_n]
-        top = [feature_names[i] for i in indices]
-        result.append('|'.join(top))
-    return result
-
+def assign_family_label(top_skills_str):
+    """Assign a human-readable label based on top skill names."""
+    skills_lower = top_skills_str.lower()
+    if any(s in skills_lower for s in ['python', 'machine learning', 'tensorflow', 'pytorch', 'deep learning', 'nlp', 'scikit']):
+        return 'Data Science & ML'
+    elif any(s in skills_lower for s in ['java', 'spring', 'node', 'react', 'angular', 'javascript', 'typescript', 'backend', 'frontend', 'web']):
+        return 'Software Engineering'
+    elif any(s in skills_lower for s in ['sql', 'tableau', 'power bi', 'excel', 'reporting', 'bi ', 'analytics', 'business']):
+        return 'Data Analytics & BI'
+    elif any(s in skills_lower for s in ['hadoop', 'spark', 'kafka', 'hive', 'hdfs', 'big data', 'etl', 'pipeline', 'airflow']):
+        return 'Big Data Engineering'
+    elif any(s in skills_lower for s in ['aws', 'azure', 'gcp', 'docker', 'kubernetes', 'devops', 'terraform', 'cloud']):
+        return 'Cloud & DevOps'
+    elif any(s in skills_lower for s in ['project management', 'agile', 'scrum', 'leadership', 'communication', 'stakeholder']):
+        return 'Management & Consulting'
+    else:
+        return 'General Technology'
 
 def main():
-    """Parse arguments, run k-means on job postings, and save results."""
-    parser = argparse.ArgumentParser(
-        description='Cluster job postings into k job families using K-means.'
-    )
-    parser.add_argument(
-        '--matrix', required=True,
-        help='Path to job-by-skill binary matrix CSV (from build_vectors.py)'
-    )
-    parser.add_argument(
-        '--output-dir', default='outputs',
-        help='Directory to save output files (default: outputs/)'
-    )
-    parser.add_argument(
-        '--k', type=int, default=DEFAULT_K,
-        help=f'Number of job family clusters (default: {DEFAULT_K})'
-    )
-    args = parser.parse_args()
+    start = time.time()
+    print(f"[cluster_job_families] Reading {MATRIX_CSV}")
 
-    os.makedirs(args.output_dir, exist_ok=True)
+    if not os.path.isfile(MATRIX_CSV):
+        print(f"ERROR: {MATRIX_CSV} not found.", file=sys.stderr)
+        sys.exit(1)
 
-    # Load and validate
-    df = load_matrix(args.matrix)
-    df = validate_matrix(df, args.k)
+    df = pd.read_csv(MATRIX_CSV, index_col=0)
+    df.index = df.index.astype(str)
+    print(f"Matrix loaded: {df.shape} ({df.shape[0]} jobs x {df.shape[1]} skills)")
 
-    print(f"Matrix shape: {df.shape} ({df.shape[0]} jobs, {df.shape[1]} skills)")
+    # Drop zero-variance columns
+    var = df.var(axis=0)
+    df = df[var[var > 0].index]
+    print(f"After variance filter: {df.shape}")
 
     X = df.values.astype(float)
     job_ids = df.index.tolist()
     feature_names = df.columns.tolist()
 
-    # Run KMeans
-    km = KMeans(n_clusters=args.k, random_state=RANDOM_STATE, n_init=DEFAULT_N_INIT)
+    # Run KMeans k=4
+    print(f"Running KMeans(k={N_CLUSTERS}, random_state={RANDOM_STATE}, n_init={N_INIT})...")
+    km = KMeans(n_clusters=N_CLUSTERS, random_state=RANDOM_STATE, n_init=N_INIT)
     labels = km.fit_predict(X)
-
     print(f"Inertia: {km.inertia_:.2f}")
 
+    # Silhouette (sample 10k for speed)
     if len(set(labels)) > 1:
-        sil = silhouette_score(X, labels)
-        print(f"Silhouette score: {sil:.4f}")
+        idx = np.random.RandomState(42).choice(len(X), size=min(10000, len(X)), replace=False)
+        sil = silhouette_score(X[idx], labels[idx])
+        print(f"Silhouette score (10k sample): {sil:.4f}")
     else:
-        print("Silhouette score: N/A (only one cluster found)")
+        sil = None
+        print("Silhouette: N/A")
 
-    # Build assignments
-    assignments_df = pd.DataFrame({'job_id': job_ids, 'cluster_id': labels})
-    assignments_out = os.path.join(args.output_dir, 'job_family_assignments.csv')
-    assignments_df.to_csv(assignments_out, index=False)
-    print(f"Assignments saved to: {assignments_out}")
+    # Save assignments
+    pd.DataFrame({'job_id': job_ids, 'cluster_id': labels}).to_csv(ASSIGN_OUT, index=False)
+    print(f"Assignments saved: {ASSIGN_OUT}")
+
+    # Elbow data k=2..8
+    print("Computing elbow data (k=2..8)...")
+    elbow = []
+    for k in range(2, 9):
+        km_k = KMeans(n_clusters=k, random_state=RANDOM_STATE, n_init=N_INIT)
+        km_k.fit(X)
+        elbow.append({'k': k, 'inertia': float(km_k.inertia_)})
+        print(f"  k={k}: inertia={km_k.inertia_:.2f}")
+
+    elbow_data = {
+        'elbow': elbow,
+        'silhouette': float(sil) if sil is not None else None,
+        'chosen_k': N_CLUSTERS,
+    }
+    with open(ELBOW_OUT, 'w', encoding='utf-8') as f:
+        json.dump(elbow_data, f, indent=2)
+    print(f"Elbow data saved: {ELBOW_OUT}")
 
     # Build summary
-    top_skills_list = get_top_skills(km.cluster_centers_, feature_names)
+    assignments_df = pd.DataFrame({'job_id': job_ids, 'cluster_id': labels})
     cluster_sizes = assignments_df['cluster_id'].value_counts().sort_index()
 
     summary_rows = []
-    for cid in range(args.k):
+    print("\nCluster summary:")
+    for cid in range(N_CLUSTERS):
+        center = km.cluster_centers_[cid]
+        top_idx = np.argsort(center)[::-1][:5]
+        top_skills_str = '|'.join(feature_names[i] for i in top_idx)
+        label = assign_family_label(top_skills_str)
+        sz = int(cluster_sizes.get(cid, 0))
         summary_rows.append({
             'cluster_id': cid,
-            'size': int(cluster_sizes.get(cid, 0)),
-            'top_skills': top_skills_list[cid],
+            'family_label': label,
+            'size': sz,
+            'top_skills': top_skills_str,
         })
-    summary_df = pd.DataFrame(summary_rows)
-    summary_out = os.path.join(args.output_dir, 'job_family_summary.csv')
-    summary_df.to_csv(summary_out, index=False)
-    print(f"Summary saved to: {summary_out}")
+        print(f"  Cluster {cid}: label={label}, size={sz}, top_skills={top_skills_str}")
 
+    pd.DataFrame(summary_rows).to_csv(SUMMARY_OUT, index=False)
+    print(f"Summary saved: {SUMMARY_OUT}")
+
+    elapsed = time.time() - start
+    print(f"\ncluster_job_families complete in {elapsed:.1f}s")
 
 if __name__ == '__main__':
     main()

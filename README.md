@@ -1,4 +1,4 @@
-# Big Data Job Profile Recruitment Analyzer
+﻿# Big Data Job Profile Recruitment Analyzer
 
 **Student:** Sahil Goyal | **Roll No.:** 11242424 | **Section:** H/H2 | **Date:** October 13, 2026
 
@@ -8,13 +8,13 @@
 
 A Hadoop-oriented Big Data analytics pipeline that processes job-posting CSV data through:
 
-**HDFS → MapReduce → Pig → Hive → Python export → Clustering → Competence Matrix → Visualizations**
+**HDFS â†’ MapReduce â†’ Pig â†’ Hive â†’ Python export â†’ Clustering â†’ Competence Matrix â†’ Visualizations**
 
 Key outputs:
 - Skill frequency counts (how many job postings require each skill)
 - k=4 job family clusters (grouping job postings by skill profile)
 - k=9 skill group clusters (grouping skills by job co-occurrence)
-- 4×9 competence matrix (Low/Medium/High skill-group coverage per job family)
+- 4Ã—9 competence matrix (Low/Medium/High skill-group coverage per job family)
 - Six visualizations covering all major results
 
 ---
@@ -37,19 +37,19 @@ Python package dependencies are listed in `analytics/requirements.txt`.
 
 ```
 bigdata/
-├── README.md              — This file
-├── .gitignore             — Git ignore rules
-├── docs/                  — Project documentation and state tracking
-├── data/                  — Raw input CSV dataset (not committed)
-├── config/                — Skills dictionary and title alias mappings
-├── mapreduce/             — Hadoop Streaming mapper and reducer scripts
-├── pig/                   — Pig Latin cleaning and join scripts
-├── hive/                  — HiveQL DDL, analytics queries, UDF notes
-├── analytics/             — Python scripts for validation, clustering, visualization
-├── outputs/               — Generated CSV/JSON outputs from analytics scripts
-├── visualizations/        — Generated PNG charts
-├── tests/                 — pytest unit tests
-└── requirements/          — Software version tracking
+â”œâ”€â”€ README.md              â€” This file
+â”œâ”€â”€ .gitignore             â€” Git ignore rules
+â”œâ”€â”€ docs/                  â€” Project documentation and state tracking
+â”œâ”€â”€ data/                  â€” Raw input CSV dataset (not committed)
+â”œâ”€â”€ config/                â€” Skills dictionary and title alias mappings
+â”œâ”€â”€ mapreduce/             â€” Hadoop Streaming mapper and reducer scripts
+â”œâ”€â”€ pig/                   â€” Pig Latin cleaning and join scripts
+â”œâ”€â”€ hive/                  â€” HiveQL DDL, analytics queries, UDF notes
+â”œâ”€â”€ analytics/             â€” Python scripts for validation, clustering, visualization
+â”œâ”€â”€ outputs/               â€” Generated CSV/JSON outputs from analytics scripts
+â”œâ”€â”€ visualizations/        â€” Generated PNG charts
+â”œâ”€â”€ tests/                 â€” pytest unit tests
+â””â”€â”€ requirements/          â€” Software version tracking
 ```
 
 ---
@@ -61,7 +61,7 @@ bigdata/
    - Any similar "job listings" dataset with title, description, and skills fields
 2. Place the CSV file in the `data/` directory.
 3. Expected columns: `job_id` (or index), `job_title`, `company`, `location`, `salary_range`, `experience_required`, `skills_required`, `description`, `post_date`
-4. Column names do not need to match exactly — `validate_dataset.py` performs fuzzy schema mapping.
+4. Column names do not need to match exactly â€” `validate_dataset.py` performs fuzzy schema mapping.
 
 ---
 
@@ -149,7 +149,7 @@ Run these steps in sequence:
 ## Known Environment Blockers
 
 - **HDFS upload, MapReduce, Pig, and Hive stages** all require an active Hadoop VM (VMware sandbox). These cannot be run on Windows directly.
-- The Python analytics scripts (steps 1, 7–12) can run standalone on any machine with Python 3.9+ and the packages in `analytics/requirements.txt`.
+- The Python analytics scripts (steps 1, 7â€“12) can run standalone on any machine with Python 3.9+ and the packages in `analytics/requirements.txt`.
 
 ---
 
@@ -161,4 +161,42 @@ Run the full unit test suite:
 python -m pytest tests/ -v
 ```
 
-Tests cover: mapper skill detection, reducer aggregation, and dataset validation. All tests use synthetic fixtures — no real data required.
+Tests cover: mapper skill detection, reducer aggregation, and dataset validation. All tests use synthetic fixtures â€” no real data required.
+
+---
+
+## GitHub Repository
+
+🔗 **GitHub:** [https://github.com/itzsahil-prog/Job-Profile-Recruitment-Analyzer](https://github.com/itzsahil-prog/Job-Profile-Recruitment-Analyzer)
+
+---
+
+## Deployment
+
+For detailed installation and execution instructions, see [DEPLOYMENT.md](docs/DEPLOYMENT.md).
+
+### Quick Start:
+
+```bash
+# Clone the repository
+git clone https://github.com/itzsahil-prog/Job-Profile-Recruitment-Analyzer.git
+cd Job-Profile-Recruitment-Analyzer
+
+# Set up virtual environment
+python -m venv .venv
+.venv\Scripts\activate
+
+# Install dependencies
+pip install -r analytics\requirements.txt
+
+# Run tests
+python -m pytest tests/ -v
+
+# Run the pipeline (local simulation mode)
+python analytics\validate_dataset.py --input data\job_descriptions.csv
+python local_sim\run_mapreduce.py
+python analytics\visualize.py
+```
+
+For complete pipeline execution and troubleshooting, refer to [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
+

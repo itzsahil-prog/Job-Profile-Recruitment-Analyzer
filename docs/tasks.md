@@ -299,7 +299,7 @@ All core implementation is complete and unit tests pass. This plan focuses on:
 
 - [~] 5.3 Push to GitHub main branch
   - Command: `git push -u origin main`
-  - If branch is named "master" instead: `git push -u origin master`
+  - Branch is now set to main
   - Monitor push progress and verify success
   - If authentication required, guide user through GitHub authentication
   - _Requirements: Upload all committed code to GitHub_

@@ -55,7 +55,7 @@ A comprehensive Hadoop-based Big Data analytics pipeline that processes 1.6 mill
 
 ## How to Run
 See DEPLOYMENT.md in the repository for detailed instructions:
-https://github.com/itzsahil-prog/Job-Profile-Recruitment-Analyzer/blob/master/docs/DEPLOYMENT.md
+https://github.com/itzsahil-prog/Job-Profile-Recruitment-Analyzer/blob/main/docs/DEPLOYMENT.md
 
 Quick start:
 ```bash

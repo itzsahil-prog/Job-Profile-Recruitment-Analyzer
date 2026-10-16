@@ -1,5 +1,7 @@
 import streamlit as st
 import pandas as pd
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import os
 import traceback
@@ -60,20 +62,27 @@ try:
             st.subheader('Top 10 Most Demanded Skills')
             fig, ax = plt.subplots(figsize=(12, 6))
             top10 = df.head(10)
-            ax.barh(top10['skill_name'], top10['post_count'], color='steelblue')
-            ax.set_xlabel('Number of Job Postings')
-            ax.set_title('Top 10 Skills by Demand')
-            ax.invert_yaxis()
-            st.pyplot(fig)
+            # Guard against missing expected columns
+            if 'skill_name' in top10.columns and 'post_count' in top10.columns:
+                ax.barh(top10['skill_name'], top10['post_count'], color='steelblue')
+                ax.set_xlabel('Number of Job Postings')
+                ax.set_title('Top 10 Skills by Demand')
+                ax.invert_yaxis()
+                st.pyplot(fig)
+            else:
+                st.warning('skill_frequency.csv is present but missing expected columns.')
             
             # Download option
-            csv = df.to_csv(index=False).encode('utf-8')
-            st.download_button(
-                label="Download Full Skill Data",
-                data=csv,
-                file_name='skill_frequency.csv',
-                mime='text/csv',
-            )
+            try:
+                csv = df.to_csv(index=False).encode('utf-8')
+                st.download_button(
+                    label="Download Full Skill Data",
+                    data=csv,
+                    file_name='skill_frequency.csv',
+                    mime='text/csv',
+                )
+            except Exception:
+                pass
         else:
             st.warning('Skill frequency data not found. Please run the MapReduce pipeline first.')
             st.code('python local_sim/run_mapreduce.py', language='bash')
@@ -87,14 +96,17 @@ try:
             st.subheader('Job Family Clusters (k=4)')
             if os.path.exists('outputs/job_family_assignments.csv'):
                 clusters = pd.read_csv('outputs/job_family_assignments.csv')
-                total_families = clusters['cluster_id'].nunique()
-                st.write(f'Total job families: {total_families}')
-                
-                # Cluster distribution
-                cluster_counts = clusters['cluster_id'].value_counts().sort_index()
-                st.bar_chart(cluster_counts)
-                
-                st.dataframe(clusters.head(20), use_container_width=True)
+                if 'cluster_id' in clusters.columns:
+                    total_families = clusters['cluster_id'].nunique()
+                    st.write(f'Total job families: {total_families}')
+                    
+                    # Cluster distribution
+                    cluster_counts = clusters['cluster_id'].value_counts().sort_index()
+                    st.bar_chart(cluster_counts)
+                    
+                    st.dataframe(clusters.head(20), use_container_width=True)
+                else:
+                    st.warning('job_family_assignments.csv is missing the cluster_id column.')
             else:
                 st.warning('Job family data not found.')
         
@@ -102,14 +114,17 @@ try:
             st.subheader('Skill Group Clusters (k=9)')
             if os.path.exists('outputs/skill_group_assignments.csv'):
                 skill_groups = pd.read_csv('outputs/skill_group_assignments.csv')
-                total_groups = skill_groups['cluster_id'].nunique()
-                st.write(f'Total skill groups: {total_groups}')
-                
-                # Skill group distribution
-                group_counts = skill_groups['cluster_id'].value_counts().sort_index()
-                st.bar_chart(group_counts)
-                
-                st.dataframe(skill_groups.head(20), use_container_width=True)
+                if 'cluster_id' in skill_groups.columns:
+                    total_groups = skill_groups['cluster_id'].nunique()
+                    st.write(f'Total skill groups: {total_groups}')
+                    
+                    # Skill group distribution
+                    group_counts = skill_groups['cluster_id'].value_counts().sort_index()
+                    st.bar_chart(group_counts)
+                    
+                    st.dataframe(skill_groups.head(20), use_container_width=True)
+                else:
+                    st.warning('skill_group_assignments.csv is missing the cluster_id column.')
             else:
                 st.warning('Skill group data not found.')
         

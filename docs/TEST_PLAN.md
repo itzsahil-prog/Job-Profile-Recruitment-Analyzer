@@ -1,6 +1,6 @@
 # Test Plan — Big Data Job Profile Recruitment Analyzer
 
-**Student:** Sahil Goyal | Roll No.: 11242424 | Section: H/H2
+**Student:** Sahil Goyal | Roll No.: 11242424 | Section: I/I2
 
 ---
 

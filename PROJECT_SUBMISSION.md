@@ -1,9 +1,9 @@
-﻿# PROJECT SUBMISSION
+# PROJECT SUBMISSION
 
 **Course:** Big Data Analytics  
 **Student Name:** Sahil Goyal  
 **Roll Number:** 11242424  
-**Section:** H/H2  
+**Section:** I/I2  
 **Submission Date:** October 16, 2026
 
 ---
@@ -99,7 +99,7 @@ All outputs are in the /outputs/ directory:
 5. job_skill_matrix.csv (binary feature matrix)
 6. job_family_assignments.csv (k=4 clusters)
 7. skill_group_assignments.csv (k=9 clusters)
-8. competence_matrix.csv (4×9 matrix)
+8. competence_matrix.csv (4�9 matrix)
 9. Evaluation metrics (elbow, silhouette scores)
 
 All visualizations are in the /visualizations/ directory (6 PNG charts).
@@ -110,7 +110,7 @@ All visualizations are in the /visualizations/ directory (6 PNG charts).
 ```bash
 python -m pytest tests/ -v
 ```
-**Result:** ✅ All 20 tests passed
+**Result:** ? All 20 tests passed
 
 Tests cover:
 - Mapper skill detection logic (9 tests)
@@ -120,11 +120,11 @@ Tests cover:
 ---
 
 ## Deployment Status
-✅ **Source code:** Committed to GitHub  
-✅ **Documentation:** Complete and accessible  
-✅ **Tests:** All passing (100% success rate)  
-✅ **Pipeline:** Fully functional without errors  
-✅ **Public Repository:** https://github.com/itzsahil-prog/Job-Profile-Recruitment-Analyzer
+? **Source code:** Committed to GitHub  
+? **Documentation:** Complete and accessible  
+? **Tests:** All passing (100% success rate)  
+? **Pipeline:** Fully functional without errors  
+? **Public Repository:** https://github.com/itzsahil-prog/Job-Profile-Recruitment-Analyzer
 
 ---
 

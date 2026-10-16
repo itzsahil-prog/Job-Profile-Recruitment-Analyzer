@@ -9,7 +9,7 @@ COMMENT 'Big Data Job Profile Recruitment Analyzer database'
 WITH DBPROPERTIES (
     'creator'     = 'Sahil Goyal',
     'roll_no'     = '11242424',
-    'section'     = 'H/H2',
+    'section'     = 'I/I2',
     'created_on'  = '2026-10-13',
     'version'     = '0.1.0'
 );

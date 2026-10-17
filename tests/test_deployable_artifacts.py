@@ -86,3 +86,12 @@ def test_evaluation_json():
     assert 'skill_groups' in data
     assert 'silhouette' in data['job_families']
     assert 'silhouette' in data['skill_groups']
+
+def test_market_trends_summary():
+    path = os.path.join(OUTPUTS_DIR, 'market_trends_summary.json')
+    assert os.path.isfile(path), f"Missing {path}"
+    with open(path, 'r') as f:
+        data = json.load(f)
+    assert 'salary_ranges' in data
+    assert 'experience_distribution' in data
+    assert 'top_tech_hiring_regions' in data

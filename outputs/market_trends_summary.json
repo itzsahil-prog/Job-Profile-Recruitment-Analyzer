@@ -1,0 +1,41 @@
+{
+  "sample_size": 50000,
+  "top_tech_hiring_regions": {
+    "United States": 14200,
+    "United Kingdom": 7800,
+    "Germany": 5900,
+    "Canada": 5400,
+    "India": 4900,
+    "Australia": 3800,
+    "Netherlands": 3100,
+    "Singapore": 2600
+  },
+  "top_roles": {
+    "Software Engineer": 4210,
+    "Data Scientist / ML Engineer": 3890,
+    "Cloud & DevOps Engineer": 3450,
+    "Data Analyst / BI Specialist": 3120,
+    "Data Engineer": 2850,
+    "Backend Developer": 2640,
+    "Full Stack Developer": 2430,
+    "Database Administrator": 1950
+  },
+  "work_types": {
+    "Full-Time": 54.2,
+    "Remote / Hybrid": 28.6,
+    "Contract": 11.4,
+    "Part-Time / Intern": 5.8
+  },
+  "experience_distribution": {
+    "Entry-Level (0-2 Yrs)": 18.5,
+    "Mid-Level (3-5 Yrs)": 46.2,
+    "Senior (6-9 Yrs)": 25.1,
+    "Lead / Architect (10+ Yrs)": 10.2
+  },
+  "salary_ranges": {
+    "$40k - $70k (Junior)": 22.4,
+    "$70k - $110k (Mid-Level)": 44.1,
+    "$110k - $155k (Senior)": 23.8,
+    "$155k+ (Staff / Lead)": 9.7
+  }
+}

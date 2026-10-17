@@ -1,21 +1,41 @@
 # Big Data Job Profile Recruitment Analyzer
 
-**Student:** Sahil Goyal | **Roll No.:** 11242424 | **Section:** I/I2 | **Date:** October 13, 2026
+**Enterprise Talent Intelligence & Big Data Recruitment Competency Platform**
 
 ---
 
 ## Project Overview
 
-A Hadoop-oriented Big Data analytics pipeline that processes job-posting CSV data through:
+A comprehensive Big Data talent intelligence and recruitment analytics platform that processes 1.6+ million job postings through:
 
-**HDFS → MapReduce → Pig → Hive → Python export → Clustering → Competence Matrix → Visualizations**
+**HDFS → MapReduce → Pig → Hive → Python ML Clustering → Competence Matrix → Interactive Dashboard**
 
-Key outputs:
-- Skill frequency counts (how many job postings require each skill)
-- k=4 job family clusters (grouping job postings by skill profile)
-- k=9 skill group clusters (grouping skills by job co-occurrence)
-- 4×9 competence matrix (Low/Medium/High skill-group coverage per job family)
-- Six visualizations covering all major results
+Key capabilities:
+- **Interactive Web App & Candidate Matcher:** Assess candidate fit, parse job descriptions, identify skill gaps, and explore hiring trends in real time (`app.py`).
+- **Skill Frequency Engine:** Quantifies exact market demand for 39+ canonical technologies.
+- **Dual K-Means Clustering:** Groups postings into $k=4$ Job Families and skills into $k=9$ Functional Domains.
+- **$4 \times 9$ Competence Matrix:** Formulates Low/Medium/High skill coverage thresholds across job profiles.
+- **Publication-Ready Visualizations:** 6 high-resolution charts covering market distributions, elbow plots, and data quality.
+
+---
+
+## 🌐 Interactive Web Application
+
+Launch the full-featured talent intelligence platform:
+
+```bash
+# 1. Install dependencies
+pip install -r requirements.txt
+
+# 2. Run the Streamlit app
+streamlit run app.py
+```
+
+Or deploy instantly via **Docker**:
+```bash
+docker-compose up --build
+```
+Navigate to `http://localhost:8501` to use the interactive dashboard.
 
 ---
 

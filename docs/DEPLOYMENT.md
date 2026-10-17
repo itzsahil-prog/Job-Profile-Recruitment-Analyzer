@@ -1,6 +1,6 @@
 # Deployment Guide - Big Data Job Profile Recruitment Analyzer
 
-**Student:** Sahil Goyal | **Roll No.:** 11242424 | **Section:** I/I2
+**Platform:** Enterprise Talent Intelligence Platform
 
 ---
 
@@ -109,11 +109,11 @@ If you have access to a Hadoop VM, see README.md for HDFS, MapReduce, Pig, and H
 2. **skill_frequency.csv** - Top skills by posting count
 3. **clean_jobs.csv** - Cleaned job postings
 4. **job_skills.csv** - Flat job-skill pairs
-5. **job_skill_matrix.csv** - Binary feature matrix (jobs × skills)
-6. **skill_job_matrix.csv** - Transposed matrix (skills × jobs)
+5. **job_skill_matrix.csv** - Binary feature matrix (jobs  skills)
+6. **skill_job_matrix.csv** - Transposed matrix (skills  jobs)
 7. **job_family_assignments.csv** - k=4 job family clusters
 8. **skill_group_assignments.csv** - k=9 skill group clusters
-9. **competence_matrix.csv** - 4×9 competence matrix
+9. **competence_matrix.csv** - 49 competence matrix
 10. **Evaluation metrics** - elbow and silhouette scores
 
 ### In isualizations/ directory:
@@ -215,9 +215,7 @@ Educational project for academic submission.
 
 ## Contact
 
-**Student:** Sahil Goyal  
-**Roll No.:** 11242424  
 **Section:** I/I2
 
-For questions or issues, refer to the documentation in the docs/ directory.
-
+For questions or issues, refer to the documentation in the docs/ directory.
+

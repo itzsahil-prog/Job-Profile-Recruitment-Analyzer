@@ -1,7 +1,6 @@
 # 🚀 Streamlit & Docker Deployment Guide
 
-**Project:** Big Data Job Profile Recruitment Analyzer  
-**Student:** Sahil Goyal | **Roll No:** 11242424 | **Section:** I/I2  
+**Platform:** Job Profile Recruitment Analyzer — Big Data Talent Intelligence  
 **Repository:** https://github.com/itzsahil-prog/Job-Profile-Recruitment-Analyzer
 
 ---

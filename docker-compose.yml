@@ -1,13 +1,14 @@
-﻿version: '3.8'
+version: '3.8'
 
 services:
-  bigdata-analyzer:
+  web:
     build: .
-    container_name: job-analyzer
+    container_name: job-profile-analyzer-web
+    ports:
+      - "8501:8501"
     volumes:
-      - ./data:/app/data
       - ./outputs:/app/outputs
       - ./visualizations:/app/visualizations
     environment:
       - PYTHONUNBUFFERED=1
-    command: python local_sim/run_mapreduce.py
+    restart: unless-stopped

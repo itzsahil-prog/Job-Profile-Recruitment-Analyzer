@@ -1,5 +1,5 @@
 {
-  "source_path": "F:\\R-Project\\bigdata\\data\\job_descriptions.csv",
+  "source_path": "F:\\bigdata\\data\\job_descriptions.csv",
   "encoding_detected": "utf-8",
   "total_rows_raw": 1615940,
   "columns": [
@@ -28,9 +28,14 @@
     "Company Profile"
   ],
   "schema_mapping": {
-    "Company Size": "company",
-    "location": "location",
-    "Job Description": "description"
+    "Job Id": "job_id",
+    "Experience": "experience_required",
+    "Salary Range": "salary_range",
+    "Job Posting Date": "post_date",
+    "Job Title": "job_title",
+    "Job Description": "description",
+    "skills": "skills_required",
+    "Company": "company"
   },
   "missing_values": {
     "Job Id": 0,
@@ -61,5 +66,5 @@
   "rows_after_dedup": 1615940,
   "rejected_rows": 0,
   "rows_retained": 1615940,
-  "validation_timestamp": "2026-10-13T18:23:37.319550+00:00"
+  "validation_timestamp": "2026-10-16T01:06:35.753781+00:00"
 }

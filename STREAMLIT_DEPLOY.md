@@ -1,218 +1,91 @@
-﻿# 🚀 Streamlit Deployment Guide
+# 🚀 Streamlit & Docker Deployment Guide
 
-## ✅ Syntax Error Fixed!
-
-The syntax error in pp.py has been resolved:
-- **Error:** Escaped quotes in f-string ({clusters[\"cluster_id\"].nunique()})
-- **Fixed:** Proper variable usage without escaping ({total_families})
+**Project:** Big Data Job Profile Recruitment Analyzer  
+**Student:** Sahil Goyal | **Roll No:** 11242424 | **Section:** I/I2  
+**Repository:** https://github.com/itzsahil-prog/Job-Profile-Recruitment-Analyzer
 
 ---
 
-## 📱 Deploy to Streamlit Cloud (FREE)
+## 📱 Option 1: Deploy to Streamlit Cloud (FREE Cloud Hosting)
 
-### Step 1: Prepare Your Repository (✅ DONE)
+Streamlit Community Cloud provides 1-click free hosting directly from your GitHub repository.
 
-Your repository is ready with:
-- ✅ pp.py - Fixed Streamlit application
-- ✅ equirements.txt - All dependencies listed
-- ✅ GitHub repository - Pushed and synced
+### Step 1: Verification Checklist
+The repository is completely configured with all deployable assets:
+- ✅ `app.py` - Modern, responsive multi-page Streamlit application
+- ✅ `requirements.txt` - All dependencies specified
+- ✅ `outputs/*.csv` & `outputs/*.json` - Pre-computed analytics summaries and competence matrix
+- ✅ `visualizations/*.png` - All 6 high-resolution analytical charts
+- ✅ GitHub repository synced on `main` branch
 
----
+### Step 2: 1-Click Launch
+1. Visit: **https://streamlit.io/cloud**
+2. Sign in with your GitHub account: `itzsahil-prog`
+3. Click **"New app"**
+4. Fill in the deployment details:
+   - **Repository:** `itzsahil-prog/Job-Profile-Recruitment-Analyzer`
+   - **Branch:** `main`
+   - **Main file path:** `app.py`
+5. Click **"Deploy!"**
 
-### Step 2: Deploy on Streamlit Cloud
-
-#### **Option A: Quick Deploy (Recommended)**
-
-1. **Go to Streamlit Cloud:**
-   Visit: https://streamlit.io/cloud
-
-2. **Sign in with GitHub:**
-   - Click "Sign in" or "Deploy an app"
-   - Authorize Streamlit to access your GitHub
-
-3. **Deploy Your App:**
-   - Click "New app"
-   - Select repository: itzsahil-prog/Job-Profile-Recruitment-Analyzer
-   - Branch: main
-   - Main file path: pp.py
-   - Click "Deploy!"
-
-4. **Your App Will Be Live At:**
-   https://job-profile-recruitment-analyzer.streamlit.app
-   
-   (or similar URL assigned by Streamlit)
+Alternatively, use this direct deploy URL:
+**https://share.streamlit.io/deploy?repository=itzsahil-prog/Job-Profile-Recruitment-Analyzer&branch=main&mainModule=app.py**
 
 ---
 
-#### **Option B: Deploy via URL**
+## 🐳 Option 2: Deploy with Docker / Docker Compose (Containerized)
 
-Click this link to deploy directly:
-https://share.streamlit.io/deploy?repository=itzsahil-prog/Job-Profile-Recruitment-Analyzer&branch=main&mainModule=app.py
+The repository includes a production-grade `Dockerfile` and `docker-compose.yml` for local or cloud container deployment (AWS ECS, GCP Cloud Run, Azure Container Instances, or DigitalOcean).
 
----
+### Running with Docker Compose:
+```bash
+docker-compose up --build
+```
+Access the application at: `http://localhost:8501`
 
-### Step 3: Configure Advanced Settings (Optional)
+### Running with Docker CLI:
+```bash
+# 1. Build the container image
+docker build -t job-profile-analyzer .
 
-In Streamlit Cloud dashboard:
-- **App settings** → Set Python version: 3.9 or higher
-- **Secrets** → Add any API keys (not needed for this project)
-- **Resources** → Keep default (free tier)
+# 2. Run the container
+docker run -d -p 8501:8501 --name analyzer-app job-profile-analyzer
 
----
-
-## 🎨 App Features
-
-Your enhanced Streamlit app now includes:
-
-### **Home Page**
-- Project overview
-- Key metrics (1.6M+ job postings, 39 skills, 4 job families)
-- Technology stack
-- GitHub link
-
-### **Skill Frequency Page**
-- Top 20 skills table
-- Interactive bar chart of top 10 skills
-- Download button for full skill data
-- Total skills count
-
-### **Job Clustering Page**
-- Job family clusters (k=4) with distribution chart
-- Skill group clusters (k=9) with distribution chart
-- Competence matrix display
-- Side-by-side comparison
-
-### **Visualizations Page**
-- All 6 PNG charts displayed
-- Skill frequency top 20
-- Job/skill distributions
-- Competence matrix heatmap
-- Elbow plots for cluster validation
+# 3. View logs
+docker logs -f analyzer-app
+```
 
 ---
 
-## 📊 Data Requirements
+## 💻 Option 3: Running Locally
 
-For the app to display data, you need these files in your repository:
+```bash
+# 1. Activate your virtual environment
+.venv\Scripts\activate   # Windows PowerShell
+# or: source .venv/bin/activate  # Linux/macOS
 
-**Required (for full functionality):**
-\\\
-outputs/skill_frequency.csv
-outputs/job_family_assignments.csv
-outputs/skill_group_assignments.csv
-outputs/competence_matrix.csv
-visualizations/*.png (6 charts)
-\\\
+# 2. Install dependencies
+pip install -r requirements.txt
 
-**Note:** These are currently in .gitignore to avoid large files. 
-
-### To Deploy With Data:
-
-**Option 1: Remove from .gitignore and commit**
-\\\ash
-# Edit .gitignore to allow specific output files
-git add outputs/skill_frequency.csv
-git add outputs/*_assignments.csv
-git add outputs/competence_matrix.csv
-git add visualizations/*.png
-git commit -m "Add data files for Streamlit deployment"
-git push origin main
-\\\
-
-**Option 2: Generate sample data**
-Create a script to generate sample data when the app starts (recommended for demo).
-
----
-
-## 🔧 Local Testing
-
-Test your Streamlit app locally before deploying:
-
-\\\ash
-# Install Streamlit
-pip install streamlit
-
-# Run the app
+# 3. Launch Streamlit
 streamlit run app.py
-
-# Open browser to: http://localhost:8501
-\\\
-
----
-
-## 🎯 Deployment Checklist
-
-- ✅ Syntax error fixed in app.py
-- ✅ requirements.txt created with all dependencies
-- ✅ Code committed to GitHub (main branch)
-- ✅ Repository is public (required for free tier)
-- ⬜ Sign up for Streamlit Cloud account
-- ⬜ Deploy app via Streamlit Cloud dashboard
-- ⬜ (Optional) Add data files or generate sample data
-- ⬜ Share your app URL!
+```
+Your default browser will automatically open to `http://localhost:8501`.
 
 ---
 
-## 📝 What Fixed the Error:
+## 🎨 Dashboard Features
 
-### **Before (BROKEN):**
-\\\python
-st.write(f'Total job families: {clusters[\"cluster_id\"].nunique()}')
-                                            ^^
-# Error: Escaped quotes in f-string cause syntax error
-\\\
-
-### **After (FIXED):**
-\\\python
-total_families = clusters['cluster_id'].nunique()
-st.write(f'Total job families: {total_families}')
-# Clean: Use variable instead of complex expression with quotes
-\\\
-
----
-
-## 🌐 Expected App URL
-
-After deployment, your app will be accessible at:
-**https://[your-app-name].streamlit.app**
-
-Example: https://job-profile-recruitment-analyzer.streamlit.app
-
----
-
-## 🎓 For Your Submission
-
-Add this to your project documentation:
-
-**Live Demo:** https://[your-streamlit-url].streamlit.app  
-**GitHub:** https://github.com/itzsahil-prog/Job-Profile-Recruitment-Analyzer  
-**Student:** Sahil Goyal | Roll No: 11242424 | Section: I/I2
-
----
-
-## 🐛 Troubleshooting
-
-### Issue: "ModuleNotFoundError"
-**Solution:** Ensure all imports are in equirements.txt
-
-### Issue: "File not found" errors
-**Solution:** Add output/visualization files to repo or generate sample data
-
-### Issue: App crashes on startup
-**Solution:** Check Streamlit Cloud logs in dashboard
-
-### Issue: Charts not displaying
-**Solution:** Ensure matplotlib is in requirements.txt and data files exist
-
----
-
-## ✅ Status
-
-- **Syntax Error:** ✅ FIXED
-- **App Code:** ✅ Enhanced with multi-page layout
-- **Requirements:** ✅ Created (requirements.txt)
-- **GitHub:** ✅ Committed and pushed
-- **Ready to Deploy:** ✅ YES
-
-**Next Step:** Go to https://streamlit.io/cloud and deploy your app!
-
+1. **Home & Architecture:**
+   - 1.6M+ job postings analyzed, 39 core skills extracted, 4 job families, 9 skill groups.
+   - Comprehensive overview of the Hadoop ecosystem pipeline.
+2. **Skill Frequency:**
+   - Ranked Top 20 skills table with interactive horizontal bar charts and CSV export.
+3. **Job Clustering & Competence Matrix:**
+   - Job Family clustering ($k=4$) with dominant skills and size distribution.
+   - Skill Group clustering ($k=9$) categorizing tech domains.
+   - $4 \times 9$ Competence Matrix displaying numeric prevalence (%) and Low/Medium/High coverage.
+4. **Visualizations Gallery:**
+   - High-resolution display of all 6 charts (Skill Frequency, Cluster Sizes, Heatmap, Elbow Plot, Data Quality).
+5. **Dataset & Pipeline Quality:**
+   - Data validation audit, record retention stats, and silhouette scores (0.284 for jobs, 0.318 for skills).

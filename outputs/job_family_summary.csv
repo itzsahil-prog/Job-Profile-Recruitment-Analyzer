@@ -1,0 +1,5 @@
+cluster_id,family_label,size,top_skills
+0,Software Engineering,9576,javascript|azure|aws|statistics|oracle
+1,Data Science & ML,1911,data visualization|tableau|python|statistics|power bi
+2,Data Science & ML,442,terraform|ansible|gcp|bash|python
+3,Data Science & ML,2138,python|java|sql|ci/cd|javascript

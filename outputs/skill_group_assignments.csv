@@ -1,4 +1,40 @@
-skill_name,cluster_id
-Python,0
-SQL,1
-Pandas,2
+skill_name,group_id,group_label
+agile,2,Databases & Storage
+ansible,0,Cloud & DevOps
+aws,3,Cloud & DevOps
+azure,3,Cloud & DevOps
+bash,0,Cloud & DevOps
+cassandra,2,Databases & Storage
+ci/cd,0,Cloud & DevOps
+data governance,2,Databases & Storage
+data modeling,1,BI & Visualization
+data pipeline,2,Databases & Storage
+data visualization,1,BI & Visualization
+data warehousing,2,Databases & Storage
+deep learning,2,Databases & Storage
+docker,0,Cloud & DevOps
+etl,2,Databases & Storage
+excel,2,Databases & Storage
+gcp,0,Cloud & DevOps
+git,2,Databases & Storage
+hadoop,7,ML & AI
+java,8,Compiled & OOP Languages
+javascript,5,Compiled & OOP Languages
+kubernetes,0,Cloud & DevOps
+machine learning,7,ML & AI
+mongodb,2,Databases & Storage
+mysql,6,Databases & Storage
+nosql,2,Databases & Storage
+oracle,6,Databases & Storage
+power bi,1,BI & Visualization
+python,4,Scripting Languages
+pytorch,7,ML & AI
+r,7,ML & AI
+scikit-learn,7,ML & AI
+spark,7,ML & AI
+sql,1,BI & Visualization
+sql server,6,Databases & Storage
+statistics,1,BI & Visualization
+tableau,1,BI & Visualization
+tensorflow,7,ML & AI
+terraform,0,Cloud & DevOps

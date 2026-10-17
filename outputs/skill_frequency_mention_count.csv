@@ -1,0 +1,40 @@
+skill,mention_count
+Java,66550
+Python,66013
+SQL,65763
+JavaScript,62570
+Agile,48756
+CI/CD,48489
+statistics,45191
+data visualization,45127
+data modeling,38060
+data governance,31018
+AWS,27989
+Azure,27989
+machine learning,24332
+Tableau,24268
+Power BI,20876
+Docker,20732
+NoSQL,17244
+R,14023
+Hadoop,14022
+Spark,14022
+Oracle,13940
+Terraform,13836
+Git,13823
+ETL,13713
+Excel,13703
+MySQL,10482
+SQL Server,10482
+GCP,10438
+Kubernetes,10366
+scikit-learn,7003
+TensorFlow,7003
+PyTorch,7003
+Bash,6918
+Ansible,6918
+MongoDB,6872
+data pipeline,3498
+data warehousing,3498
+deep learning,3442
+Cassandra,3420

@@ -1,0 +1,10 @@
+group_id,group_label,member_skills
+0,Cloud & DevOps,ansible|bash|ci/cd|docker|gcp|kubernetes|terraform
+1,BI & Visualization,data modeling|data visualization|power bi|sql|statistics|tableau
+2,Databases & Storage,agile|cassandra|data governance|data pipeline|data warehousing|deep learning|etl|excel|git|mongodb|nosql
+3,Cloud & DevOps,aws|azure
+4,Scripting Languages,python
+5,Compiled & OOP Languages,javascript
+6,Databases & Storage,mysql|oracle|sql server
+7,ML & AI,hadoop|machine learning|pytorch|r|scikit-learn|spark|tensorflow
+8,Compiled & OOP Languages,java

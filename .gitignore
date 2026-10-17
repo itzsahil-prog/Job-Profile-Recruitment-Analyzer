@@ -1,19 +1,28 @@
-﻿__pycache__/
+__pycache__/
 *.pyc
 .env
 venv/
 .venv/
 env/
 *.egg-info/
+
+# Raw dataset files (large)
 data/*.csv
 !data/sample*.csv
-outputs/*.csv
-visualizations/*.png
+
+# Intermediate large data artifacts (>1MB)
+outputs/clean_jobs.csv
+outputs/job_skills.csv
+outputs/job_skill_matrix.csv
+outputs/job_ids_sample.csv
+
+# Logs & temporary files
 *.log
+outputs/*_log.txt
 *.tmp
 node_modules/
 .DS_Store
 Thumbs.db
 .pytest_cache/
-*.pyc
 .meta.json
+

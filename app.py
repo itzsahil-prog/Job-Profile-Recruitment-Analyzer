@@ -392,11 +392,15 @@ try:
                 with col_b2:
                     st.markdown("#### Market Breakdown")
                     total_compared = sub_df['post_count'].sum()
-                    sub_df['Market Share (%)'] = (sub_df['post_count'] / total_compared * 100).round(1)
+                    if total_compared > 0:
+                        sub_df['Market Share (%)'] = (sub_df['post_count'] / total_compared * 100).round(1)
+                    else:
+                        sub_df['Market Share (%)'] = 0.0
                     st.dataframe(sub_df[['skill_name', 'post_count', 'Market Share (%)']], use_container_width=True, hide_index=True)
                     
-                    winner = sub_df.iloc[0]
-                    st.info(f"🏆 **Leader:** `{winner['skill_name']}` dominates with **{int(winner['post_count']):,}** postings ({winner['Market Share (%)']}% of compared set).")
+                    if not sub_df.empty:
+                        winner = sub_df.iloc[0]
+                        st.info(f"🏆 **Leader:** `{winner['skill_name']}` dominates with **{int(winner['post_count']):,}** postings ({winner['Market Share (%)']}% of compared set).")
         else:
             st.info("Skill data unavailable for comparison.")
 
@@ -419,13 +423,17 @@ try:
                 st.markdown("#### Summary of Discovered Job Profiles")
                 st.dataframe(fam_df, use_container_width=True)
                 
-                fig, ax = plt.subplots(figsize=(8, 4))
-                ax.bar(fam_df['family_label'].astype(str), fam_df['size'], color='#008080')
-                ax.set_ylabel('Number of Postings')
-                ax.set_title('Recruitment Distribution Across Job Families')
-                plt.xticks(rotation=20, ha='right')
-                plt.tight_layout()
-                st.pyplot(fig)
+                lbl_col = 'family_label' if 'family_label' in fam_df.columns else ('cluster_id' if 'cluster_id' in fam_df.columns else fam_df.columns[0])
+                size_col = 'size' if 'size' in fam_df.columns else next((c for c in fam_df.columns if 'size' in c.lower() or 'count' in c.lower() or 'post' in c.lower()), None)
+                
+                if size_col:
+                    fig, ax = plt.subplots(figsize=(8, 4))
+                    ax.bar(fam_df[lbl_col].astype(str), fam_df[size_col], color='#008080')
+                    ax.set_ylabel('Number of Postings')
+                    ax.set_title('Recruitment Distribution Across Job Families')
+                    plt.xticks(rotation=20, ha='right')
+                    plt.tight_layout()
+                    st.pyplot(fig)
             else:
                 st.info("Job family summary data loading...")
 
@@ -434,10 +442,22 @@ try:
             if grp_sum_file:
                 grp_df = pd.read_csv(grp_sum_file)
                 st.markdown("#### 9 Functional Tech Stack Domains")
+                
+                # Derive 'size' column safely if not present
+                if 'size' not in grp_df.columns:
+                    if 'member_skills' in grp_df.columns:
+                        grp_df['size'] = grp_df['member_skills'].fillna('').apply(
+                            lambda x: len([s for s in str(x).split('|') if s.strip()])
+                        )
+                    else:
+                        grp_df['size'] = 1
+                
+                lbl_col = 'group_label' if 'group_label' in grp_df.columns else ('group_id' if 'group_id' in grp_df.columns else grp_df.columns[0])
+                
                 st.dataframe(grp_df, use_container_width=True)
                 
                 fig, ax = plt.subplots(figsize=(9, 4))
-                ax.bar(grp_df['group_label'].astype(str), grp_df['size'], color='#4682b4')
+                ax.bar(grp_df[lbl_col].astype(str), grp_df['size'], color='#4682b4')
                 ax.set_ylabel('Skills Count')
                 ax.set_title('Skill Count per Functional Domain')
                 plt.xticks(rotation=30, ha='right')

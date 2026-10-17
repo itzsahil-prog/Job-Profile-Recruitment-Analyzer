@@ -124,6 +124,7 @@ def main():
         summary_rows.append({
             'group_id': gid,
             'group_label': lbl,
+            'size': len(members),
             'member_skills': '|'.join(members),
         })
         print(f"  Group {gid}: label={lbl}, size={len(members)}, sample={members[:5]}")

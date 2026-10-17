@@ -41,6 +41,19 @@ def test_clustering_outputs():
     col = next((c for c in grp_df.columns if 'cluster' in c.lower() or 'group' in c.lower()))
     assert grp_df[col].nunique() == 9
 
+def test_summary_files_structure():
+    fam_sum_path = os.path.join(OUTPUTS_DIR, 'job_family_summary.csv')
+    assert os.path.isfile(fam_sum_path), f"Missing {fam_sum_path}"
+    fam_sum = pd.read_csv(fam_sum_path)
+    assert 'size' in fam_sum.columns
+    assert len(fam_sum) == 4
+
+    grp_sum_path = os.path.join(OUTPUTS_DIR, 'skill_group_summary.csv')
+    assert os.path.isfile(grp_sum_path), f"Missing {grp_sum_path}"
+    grp_sum = pd.read_csv(grp_sum_path)
+    assert 'size' in grp_sum.columns or 'member_skills' in grp_sum.columns
+    assert len(grp_sum) == 9
+
 def test_competence_matrix():
     path = os.path.join(OUTPUTS_DIR, 'competence_matrix_numeric.csv')
     assert os.path.isfile(path), f"Missing {path}"
